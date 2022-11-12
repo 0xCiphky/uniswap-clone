@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.14;
 
 import "./lib/Tick.sol";
@@ -7,7 +8,7 @@ error InvalidTickRange(int24 lowerTick, int24 upperTick);
 error NotEnoughLiquidity(uint128 amount);
 error InsuffecientInputAmount();
 
-event Mint(address, address, int24, int24, uint128, uint128, uint128);
+event Mint(address sender, address owner, int24 lowerTick, int24 upperTick, uint128 amount, uint128 amount0, uint128 amount1);
 
 contract UniswapV3Pool {
 
