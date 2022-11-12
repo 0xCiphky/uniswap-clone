@@ -1,6 +1,6 @@
 
 
-library Tick(
+library Tick{
 
     struct Info{
         bool initialized;
@@ -8,7 +8,7 @@ library Tick(
     }
 
     function update(
-        mapping(int24 => Tick.Info) storage self;
+        mapping(int24 => Tick.Info) storage self,
         int24 tick,
         uint128 liquidityDelta
     ) internal
@@ -27,7 +27,7 @@ library Tick(
             tickInfo.initialized = true;
         }
 
-        tickInfo.liquidity = liquidityAfter
+        tickInfo.liquidity = liquidityAfter;
     }
 
-)
+}

@@ -1,4 +1,4 @@
-library Tick2 {
+library Tick2{
 
     //struct that holds info abou the tick range
     // initialized: is there a;ready a pool initialized(created) at that tick range
@@ -14,12 +14,12 @@ library Tick2 {
     function update
     (
         // This is the whole tick mapping with all tick ranges
-        mapping (int24 => Tick2.Info) storage self;
+        mapping (int24 => Tick2.Info) storage self,
         int24 tick,
         uint128 liquidityDelta
     ) internal {
         // This is the specific tick that the user specified for from params
-         Tick2.INFO storage tickInfo = self[tick]
+         Tick2.INFO storage tickInfo = self[tick];
 
          //store the currLiq of that tick in a var
          uint128 liquidityBefore = tickInfo.liquidity;
@@ -27,7 +27,7 @@ library Tick2 {
 
         // if the tick is not initialized meaning there is no pool there we create a new one
          if(liquidityBefore == 0) {
-            tickInfo.initialized = true
+            tickInfo.initialized = true;
         }
         // finally we update the ticks liquidity to the new liquidity with the users amount
         tickInfo.liquidity = liquidityAfter;

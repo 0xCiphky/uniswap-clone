@@ -1,19 +1,21 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.14;
 
-import "./lib/Tick.sol";
+import "../lib/Tick.sol";
 
 //Errors
 error InvalidTickRange(int24 lowerTick, int24 upperTick);
 error NotEnoughLiquidity(uint128 amount);
 error InsuffecientInputAmount();
 
-event Mint(address sender, address owner, int24 lowerTick, int24 upperTick, uint128 amount, uint128 amount0, uint128 amount1);
+
 
 contract UniswapV3Pool {
 
-    using Tick for mapping(int24 => Tick.Info)
-    using Position for mapping (bytes32 => Position.Info);
+    event Mint(address sender, address owner, int24 lowerTick, int24 upperTick, uint128 amount, uint128 amount0, uint128 amount1);
+
+    using Tick for mapping(int24 => Tick.Info);
+    using Position for mapping(bytes32 => Position.Info);
     using Position for Position.Info;
 
     int24 internal constant MIN_TICK = -887272;
@@ -42,7 +44,7 @@ contract UniswapV3Pool {
         token0 = token0_;
         token1 = token1_;
 
-        slot0 = Slot0(sqrtPricex96: sqrtPricex96, tick: tick)
+        slot0 = Slot0{sqrtPricex96: sqrtPricex96, tick: tick};
     }
 
     //upper and lower bounds are used to set the tick range
@@ -61,12 +63,12 @@ contract UniswapV3Pool {
             lowerTick < MIN_TICK || 
             upperTick > MAX_TICK
         ) {
-            revert InvalidTickRange(lowerTick, upperTick)
+            revert InvalidTickRange(lowerTick, upperTick);
         }
 
 
         if (amount == 0) {
-            revert NotEnoughLiquidity(amount)
+            revert NotEnoughLiquidity(amount);
         }
 
         ticks.update(lowerTick, amount);
@@ -77,11 +79,11 @@ contract UniswapV3Pool {
             lowerTick,
             upperTick
         );
-        position.update(amount)
+        position.update(amount);
 
         //these vals should be calculated through a func but we just hardcode it for now
-        amount0 = ethers.utils.parseEther(0.998976618347425280);
-        amount1 = ethers.utils.parseEther(5000);
+        amount0 = 0.998976618347425280 ether;
+        amount1 = 5000 ether;
 
         liquidity += uint128(amount);
 
@@ -91,21 +93,21 @@ contract UniswapV3Pool {
 
         //if the amount that we are of liquidity we are depositing in is greater then 0
         //then we get the balance of the tokens before we add that liquidity
-        if(amount0 > 0) {balance0Before = balance0()};
-        if(amount1 > 0) {balance1Before = balance1()};
+        if(amount0 > 0) {balance0Before = balance0();}
+        if(amount1 > 0) {balance1Before = balance1();}
 
         //This is a callback function where the user adds the liquidity amount0 and amount1 to the pools
         IuniswapV3MintCallBack(msg.sender).uniswapV3MintCallBack(
             amount0,
             amount1
-        )
+        );
 
         //We then do a check to see if the callback was successfull and the liquidity was added to the pools
-        if( amount0 > 0 && balance0Before + amount0 > balance0()) {
-            revert InsuffecientInputAmount()
+        if(amount0 > 0 && balance0Before + amount0 > balance0()) {
+            revert InsuffecientInputAmount();
         }
         if( amount1 > 0 && balance1Before + amount1 > balance1()) {
-            revert InsuffecientInputAmount()
+            revert InsuffecientInputAmount();
         }
 
         emit Mint(msg.sender, owner, lowerTick, upperTick, amount, amount0, amount1);
@@ -113,10 +115,10 @@ contract UniswapV3Pool {
 
     // functions to get the balance of the two tokens
     function balance0() internal returns(uint256 balance) {
-        balance = IERC20(token0).balanceOf(address(this))
+        balance = IERC20(token0).balanceOf(address(this));
     }
     function balance1() internal returns(uint256 balance) {
-        balance = IERC20(token1).balanceOf(address(this))
+        balance = IERC20(token1).balanceOf(address(this));
     }
 
 }
