@@ -1,7 +1,9 @@
 
 // The position library tracks how much liquidity a certain person has at that position
 
-library Position(
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.14;
+library Position{
 
     struct Info {
         uint128 liquidity;
@@ -16,7 +18,7 @@ library Position(
         ) internal 
         {
         uint128 liquidityBefore = self.liquidity;
-        uint128 liquidityAfter = self.liquidity + liquidityDelta;
+        uint128 liquidityAfter = liquidityBefore + liquidityDelta;
 
         self.liquidity = liquidityAfter;
         }
@@ -26,12 +28,12 @@ library Position(
         mapping(bytes32 => Info) storage self,
         address owner,
         int24 lowerTick,
-        int24 upperTick,
+        int24 upperTick
     )
     //Each position is uniquely identified by three keys: owner address, lower tick index, and upper tick index. 
     //We hash the three to make storing of data cheaper: when hashed, every key will take 32 bytes, 
     //instead of 96 bytes when owner, lowerTick, and upperTick are separate keys.
-    internal view returns {
-        position = self[keccack256(abi.encodePacked(owner, lowerTick, upperTick))];
+    internal view returns(Position.Info storage position){
+        position = self[keccak256(abi.encodePacked(owner, lowerTick, upperTick))];
     }
-)
+}

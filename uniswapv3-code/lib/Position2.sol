@@ -1,5 +1,6 @@
 //Library that will hold info about the customers positions and have functions to update/get positions
-
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.14;
 library Position2{
     
     struct Info{
@@ -10,12 +11,12 @@ library Position2{
     function get(
         // we get the positions mapping that holds all the positions for this liq pool
         // We get this from the storage
-        mapping(bytes31 => Position.Info) storage self,
+        mapping(bytes32 => Position2.Info) storage self,
         address owner,
         int24 lowerTick,
         int24 upperTick
-    ) internal view returns(Position.Info storage position) {
-        position = self[keccack256(abi.encodePacked(owner, upperTick, lowerTick))];
+    ) internal view returns(Position2.Info storage position) {
+        position = self[keccak256(abi.encodePacked(owner, upperTick, lowerTick))];
     }
 
     // we update the liquidity held by that user in the position

@@ -2,10 +2,11 @@ pragma solidity ^0.8.14;
 
 import "../lib/Position2.sol";
 import "../lib/Tick2.sol";
+import "../Interfaces/IERC20.sol";
 
 //Custom errors
 error UNISWAPV4POOL_INVALIDPARAMS(int24, int24);
-error UNISWAPV4POOL_INVALIDAMOUNT(uint128);
+error UNISWAPV4POOL_INVALIDAMOUNT(uint256);
 error InsuffecientInputAmount();
 
 
@@ -16,9 +17,9 @@ contract UniswapV3Pool{
     
 
     //lets initalize the libraries to use later
-    using Position2 for mapping(bytes32 => Position.Info);
-    using Position2 for Position.Info;
-    using Tick2 for mapping(int24 => Tick.Info);
+    using Position2 for mapping(bytes32 => Position2.Info);
+    using Position2 for Position2.Info;
+    using Tick2 for mapping(int24 => Tick2.Info);
 
     //Pool tokens 
     address public immutable token0;
@@ -36,11 +37,12 @@ contract UniswapV3Pool{
         //current tick
         int24 tick;
     }
+    Slot0 public slot0;
 
     // This mapping will be tick-range to tick info
-    mapping(int24 => Tick.Info) public ticks;
+    mapping(int24 => Tick2.Info) public ticks;
     //this mapping will be a unique ID(owner) to their position info
-    mapping(bytes32 => Position.Info) public positions;
+    mapping(bytes32 => Position2.Info) public positions;
 
     constructor(
         address token0_,
@@ -49,11 +51,8 @@ contract UniswapV3Pool{
         int24 tick
     ) {
         token0 = token0_;
-        token1 = token1;
-        slot0 = slot0{
-            sqrtPricex96: sqrtprice96,
-            tick: tick
-        };
+        token1 = token1_;
+        slot0 = Slot0({sqrtPricex96: sqrtPricex96, tick: tick});
     }
 
     //Mint function
@@ -62,7 +61,7 @@ contract UniswapV3Pool{
     //the tick ranges and the amount of liquidity he would like to provide to the pool
 
     //If the function is successful it will return the two token amounts that was deposited in the liquidity
-    function Mint(
+    function mint(
         address owner,
         int24 lowerTick,
         int24 upperTick,
@@ -88,7 +87,7 @@ contract UniswapV3Pool{
 
         //lets update the position mapping
         //we encode the owner address, lowerTick and upperTick and use that to fetch the position
-        position.Info storage position =  position.get(owner, lowerTick, upperTick);
+        Position2.Info storage position =  positions.get(owner, lowerTick, upperTick);
 
         // position: is the position of the cuurent user, we retrieved using the get function
         // we now update it by adding the amount(users liqu) to the positions liquidity
@@ -112,10 +111,10 @@ contract UniswapV3Pool{
         if(amount1 > 0 ) {balance1Before = balance1();}
 
         //this is a callback func to the user which calls for him to send the funds
-        IUniswapV3MintCallBack(msg.sender).UniswapV4MintCallBack(
-            amount0,
-            amount1
-        );
+        //IUniswapV3MintCallBack(msg.sender).UniswapV4MintCallBack(
+        //    amount0,
+        //    amount1
+        //);
 
         if( amount0 > 0 && balance0Before + amount0 > balance0()) {revert InsuffecientInputAmount();}
         if( amount1 > 0 && balance1Before + amount1 > balance1()) {revert InsuffecientInputAmount();}

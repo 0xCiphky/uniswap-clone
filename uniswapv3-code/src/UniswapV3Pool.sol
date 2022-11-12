@@ -2,6 +2,8 @@
 pragma solidity ^0.8.14;
 
 import "../lib/Tick.sol";
+import "../lib/Position.sol";
+import "../Interfaces/IERC20.sol";
 
 //Errors
 error InvalidTickRange(int24 lowerTick, int24 upperTick);
@@ -12,7 +14,7 @@ error InsuffecientInputAmount();
 
 contract UniswapV3Pool {
 
-    event Mint(address sender, address owner, int24 lowerTick, int24 upperTick, uint128 amount, uint128 amount0, uint128 amount1);
+    event Mint(address sender, address owner, int24 lowerTick, int24 upperTick, uint128 amount, uint256 amount0, uint256 amount1);
 
     using Tick for mapping(int24 => Tick.Info);
     using Position for mapping(bytes32 => Position.Info);
@@ -44,7 +46,7 @@ contract UniswapV3Pool {
         token0 = token0_;
         token1 = token1_;
 
-        slot0 = Slot0{sqrtPricex96: sqrtPricex96, tick: tick};
+        slot0 = Slot0({sqrtPricex96: sqrtPricex96, tick: tick});
     }
 
     //upper and lower bounds are used to set the tick range
@@ -97,10 +99,10 @@ contract UniswapV3Pool {
         if(amount1 > 0) {balance1Before = balance1();}
 
         //This is a callback function where the user adds the liquidity amount0 and amount1 to the pools
-        IuniswapV3MintCallBack(msg.sender).uniswapV3MintCallBack(
-            amount0,
-            amount1
-        );
+        //IuniswapV3MintCallBack(msg.sender).uniswapV3MintCallBack(
+        //    amount0,
+        //    amount1
+        //);
 
         //We then do a check to see if the callback was successfull and the liquidity was added to the pools
         if(amount0 > 0 && balance0Before + amount0 > balance0()) {

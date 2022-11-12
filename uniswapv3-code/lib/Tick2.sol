@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.14;
+
 library Tick2{
 
     //struct that holds info abou the tick range
@@ -19,7 +22,7 @@ library Tick2{
         uint128 liquidityDelta
     ) internal {
         // This is the specific tick that the user specified for from params
-         Tick2.INFO storage tickInfo = self[tick];
+         Tick2.Info storage tickInfo = self[tick];
 
          //store the currLiq of that tick in a var
          uint128 liquidityBefore = tickInfo.liquidity;
